@@ -1,0 +1,29 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./apps/api:/app/apps/api # Mount for development, remove for production
+    environment:
+      NODE_ENV: development # Or production
+    # depends_on:
+    #   - web # If API depends on web (less common)
+    # Removed dependency on 'web' to break the cycle
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/web:/app/apps/web # Mount for development, remove for production
+      - ./packages:/app/packages # Mount shared packages for development
+    environment:
+      NODE_ENV: development # Or production
+      NEXT_PUBLIC_API_URL: http://api:3001 # How the web app can reach the API
+    depends_on:
+      - api # Web app depends on the API
